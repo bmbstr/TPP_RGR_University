@@ -31,9 +31,18 @@ public class StudentWebController {
     }
 
     @PostMapping("/students/add")
-    public String addStudent(@RequestParam String firstName, @RequestParam String lastName, @RequestParam Integer groupId) {
+    public String addStudent(@RequestParam String firstName, @RequestParam String lastName,
+            @RequestParam Integer groupId) {
         repository.saveStudent(firstName, lastName, groupId);
         return "redirect:/search";
+    }
+
+    @GetMapping("/search-vulnerable")
+    public String searchVulnerable(@RequestParam(name = "lastName", required = false) String lastName, Model model) {
+        if (lastName != null) {
+            model.addAttribute("results", repository.findByLastNameInsecure(lastName));
+        }
+        return "search";
     }
 
     @GetMapping("/students/delete/{id}")
@@ -97,5 +106,41 @@ public class StudentWebController {
     public String deleteGrade(@PathVariable Integer id) {
         repository.deleteById("grades", id);
         return "redirect:/grades";
+    }
+
+    @PostMapping("/console-command")
+    public String handleConsoleCommand(@RequestParam String command) {
+        String lowerCommand = command.trim().toLowerCase();
+
+        try {
+            // --- РОБОТА ЗІ СТУДЕНТАМИ ---
+            if (lowerCommand.startsWith("delete student")) {
+                int firstQuote = command.indexOf("'");
+                int lastQuote = command.lastIndexOf("'");
+                if (firstQuote != -1 && lastQuote > firstQuote) {
+                    String idStr = command.substring(firstQuote + 1, lastQuote).trim();
+                    repository.deleteById("students", Integer.parseInt(idStr));
+                }
+            } else if (lowerCommand.startsWith("insert student")) {
+                repository.saveStudent("Taras", "Shevchenko", 1);
+            }
+
+            // --- РОБОТА З ГРУПАМИ---
+            else if (lowerCommand.startsWith("delete group")) {
+                int firstQuote = command.indexOf("'");
+                int lastQuote = command.lastIndexOf("'");
+                if (firstQuote != -1 && lastQuote > firstQuote) {
+                    String idStr = command.substring(firstQuote + 1, lastQuote).trim();
+                    repository.deleteById("groups", Integer.parseInt(idStr));
+                }
+            } else if (lowerCommand.startsWith("insert group")) {
+                repository.saveGroup("TEST-101");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "redirect:/search";
     }
 }
