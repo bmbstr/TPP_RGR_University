@@ -19,15 +19,15 @@ public class StudentWebController {
         return "index";
     }
 
-    // СТУДЕНТИ
-    @GetMapping("/search")
+    // СТУДЕНТИ - тепер цей метод відкриватиметься і по /students, і по /search
+    @GetMapping({ "/students", "/search" })
     public String searchStudents(@RequestParam(required = false) String lastName, Model model) {
         if (lastName != null && !lastName.isEmpty()) {
             model.addAttribute("students", repository.findByLastNameInsecure(lastName));
         } else {
             model.addAttribute("students", repository.findAll());
         }
-        return "search";
+        return "search"; // відкриває файл search.html
     }
 
     @PostMapping("/students/add")
@@ -92,7 +92,9 @@ public class StudentWebController {
     // ОЦІНКИ
     @GetMapping("/grades")
     public String showGrades(Model model) {
-        model.addAttribute("grades", repository.findAllGrades());
+        model.addAttribute("grades", repository.findAllGradesWithNames());
+        model.addAttribute("students", repository.findAll());
+        model.addAttribute("courses", repository.findAllCourses());
         return "grades";
     }
 

@@ -1,45 +1,113 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
-    <title>University System</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <title>Головна - EDU-SYSTEM</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #b1a2f2;
+        .hero-section {
+            background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
+            color: white;
+            padding: 60px 0;
+            margin-bottom: 30px;
         }
 
-        .main-card {
-            background: white;
+        .nav-link {
+            font-weight: 500;
+        }
+
+        .guest-box {
             border-radius: 15px;
+            background: white;
             padding: 40px;
-            margin-top: 100px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
 
-<body>
-    <div class="container d-flex justify-content-center">
-        <div class="col-md-8 main-card text-center">
-            <h1 class="mb-4">University System 🎓</h1>
+<body class="bg-light">
 
-            <div class="d-flex justify-content-center gap-2 mb-4">
-                <a href="/search" class="btn btn-primary btn-lg">Students</a>
-                <a href="/groups" class="btn btn-success btn-lg">Groups</a>
-                <a href="/courses" class="btn btn-info btn-lg text-white">Courses</a>
-                <a href="/grades" class="btn btn-warning btn-lg text-white">Grades</a>
-            </div>
-
-            <hr>
-            <p class="text-muted">Дані завантажуються з бази PostgreSQL</p>
-
-            <div class="alert alert-info mt-3" style="font-size: 0.9rem;">
-                <strong>Примітка для захисту:</strong> Перейдіть у розділ <b>Students</b>, щоб продемонструвати SQL
-                Injection (1.3.2) та роботу з командами (1.3.3).
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow" sec:authorize="isAuthenticated()">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">🎓 EDU-SYSTEM</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link active" href="/students">Студенти</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/groups">Групи</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/courses">Курси</a></li>
+                    <li class="nav-item"><a class="nav-link text-warning" href="/grades">ОЦІНКИ</a></li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <span class="navbar-text text-white me-3">
+                        Привіт, <strong sec:authentication="name"></strong>!
+                    </span>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" class="btn btn-outline-light btn-sm">Вийти</button>
+                    </form>
+                </div>
             </div>
         </div>
+    </nav>
+
+    <header class="hero-section text-center shadow-sm">
+        <div class="container">
+            <h1 class="display-4 fw-bold">Система Успішності Студентів</h1>
+            <p class="lead">Керування навчальним процесом в одному місці</p>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <div sec:authorize="isAuthenticated()" class="row g-4 text-center">
+            <div class="col-md-3">
+                <div class="card h-100 shadow-sm border-0 p-3">
+                    <h3>👥</h3>
+                    <h5>Студенти</h5>
+                    <a href="/students" class="btn btn-primary btn-sm mt-2">Перейти</a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 shadow-sm border-0 p-3">
+                    <h3>📚</h3>
+                    <h5>Курси</h5>
+                    <a href="/courses" class="btn btn-primary btn-sm mt-2">Перейти</a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 shadow-sm border-0 p-3">
+                    <h3>🏫</h3>
+                    <h5>Групи</h5>
+                    <a href="/groups" class="btn btn-primary btn-sm mt-2">Перейти</a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 shadow-sm border-0 p-3 border-warning">
+                    <h3>⭐</h3>
+                    <h5>Оцінки</h5>
+                    <a href="/grades" class="btn btn-warning btn-sm mt-2 fw-bold">Відкрити журнал</a>
+                </div>
+            </div>
+        </div>
+
+        <div sec:authorize="isAnonymous()" class="guest-box shadow-sm text-center mx-auto" style="max-width: 600px;">
+            <h3 class="fw-bold mb-4">Вітаємо! 👋</h3>
+            <p class="text-muted fs-5 mb-4">
+                Щоб побачити детальну інформацію про освітній процес, списки студентів та оцінки, будь ласка, увійдіть у
+                свій аккаунт або зареєструйтесь.
+            </p>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <a th:href="@{/login}" class="btn btn-primary btn-lg px-5 shadow">Увійти</a>
+                <a th:href="@{/register}" class="btn btn-outline-primary btn-lg px-5 shadow">Реєстрація</a>
+            </div>
+        </div>
+
     </div>
+
+    <footer class="text-center mt-5 py-4 text-muted">
+        <hr>
+        <p>&copy; 2026 Лабораторна робота ТПП. Всі права захищені.</p>
+    </footer>
+
 </body>
 
 </html>

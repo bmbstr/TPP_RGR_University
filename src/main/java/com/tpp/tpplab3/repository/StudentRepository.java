@@ -151,4 +151,35 @@ public class StudentRepository {
             e.printStackTrace();
         }
     }
+
+    // НОВИЙ МЕТОД ДЛЯ ОЦІНОК З ІМЕНАМИ
+    public List<GradeDTO> findAllGradesWithNames() {
+        List<GradeDTO> result = new ArrayList<>();
+        // SQL запит, який з'єднує 3 таблиці: оцінки, студенти та курси
+        String sql = "SELECT g.id, s.last_name, s.first_name, c.course_name, g.grade " +
+                "FROM grades g " +
+                "JOIN students s ON g.student_id = s.id " +
+                "JOIN courses c ON g.course_id = c.id " +
+                "ORDER BY g.id";
+
+        try (Connection conn = DriverManager.getConnection(url, user, password);
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                // Формуємо повне ім'я студента
+                String fullName = rs.getString("last_name") + " " + rs.getString("first_name");
+
+                // Створюємо об'єкт DTO (Data Transfer Object)
+                result.add(new GradeDTO(
+                        rs.getInt("id"),
+                        fullName,
+                        rs.getString("course_name"),
+                        rs.getInt("grade")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 }
